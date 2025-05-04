@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const jambScholarshipRoutes = require("./routes/jambScholarshipRoutes");
+const userRoutes = require("./routes/userRoutes");
 
 const app = express();
 app.use(express.json());
@@ -30,6 +31,7 @@ mongoose.connect(process.env.MONGO_URI)
 
 // Use routes
 app.use('/api/v1', jambScholarshipRoutes);
+app.use('/api/v1', userRoutes);
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
