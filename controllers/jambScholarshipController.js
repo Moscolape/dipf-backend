@@ -7,19 +7,31 @@ exports.registerJambScholarshipApplicant = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  if (!req.file) {
-    return res.status(400).json({ message: "Jamb slip file is missing!" });
+  if (
+    !req.files ||
+    !req.files.jambSlip ||
+    !req.files.passport ||
+    !req.files.oLevelSlip
+  ) {
+    return res
+      .status(400)
+      .json({ message: "One or more required files are missing!" });
   }
 
   try {
-    const jambSlip = req.file.path.replace("\\", "/");
+    const jambSlip = req.files.jambSlip[0].path.replace(/\\/g, "/");
+    const passport = req.files.passport[0].path.replace(/\\/g, "/");
+    const oLevelSlip = req.files.oLevelSlip[0].path.replace(/\\/g, "/");
 
     const newApplicant = new JambScholarshipApplicant({
       ...req.body,
       jambSlip,
+      passport,
+      oLevelSlip,
     });
 
     await newApplicant.save();
+
     res.status(201).json({
       message: "JAMB Scholarship applicant registered successfully",
       applicant: newApplicant,

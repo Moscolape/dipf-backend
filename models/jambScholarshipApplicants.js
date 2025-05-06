@@ -16,6 +16,8 @@ const jambScholarshipSchema = new mongoose.Schema({
   firstChoice: { type: String, required: true },
   secondChoice: { type: String, required: true },
   jambSlip: { type: String, required: true },
+  passport: { type: String, required: true },
+  oLevelSlip: { type: String, required: true },
 }, { timestamps: true });
 
 const JambScholarshipApplication = mongoose.model("JambScholarshipApplication", jambScholarshipSchema);
