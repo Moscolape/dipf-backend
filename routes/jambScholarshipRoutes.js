@@ -1,6 +1,8 @@
 const express = require("express");
 const {
   registerJambScholarshipApplicant,
+  getAllJambScholarshipApplicants,
+  getJambScholarshipApplicantById
 } = require("../controllers/jambScholarshipController");
 const upload = require("../config/multerConfig");
 
@@ -11,5 +13,7 @@ router.post(
   upload.single("jambSlip"),
   registerJambScholarshipApplicant
 );
+router.get("/applicants", getAllJambScholarshipApplicants);
+router.get("/applicants/:id", getJambScholarshipApplicantById);
 
 module.exports = router;
