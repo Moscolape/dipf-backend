@@ -43,32 +43,35 @@ exports.registerJambScholarshipApplicant = async (req, res) => {
 };
 
 exports.getAllJambScholarshipApplicants = async (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
-
-  const skip = (page - 1) * limit;
-
-  try {
-    const [total, applicants] = await Promise.all([
-      JambScholarshipApplicant.countDocuments(),
-      JambScholarshipApplicant.find()
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit),
-    ]);
-
-    res.status(200).json({
-      message: "JAMB scholarship applicants fetched successfully",
-      applicants,
-      totalItems: total,
-      currentPage: page,
-      itemsPerPage: limit,
-    });
-  } catch (error) {
-    console.error("Error fetching applicants:", error);
-    res.status(500).json({ message: "Server Error", error: error.message });
-  }
-};
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+  
+    const sortBy = req.query.sortBy || "createdAt";
+    const order = req.query.order === "asc" ? 1 : -1;
+  
+    try {
+      const [total, applicants] = await Promise.all([
+        JambScholarshipApplicant.countDocuments(),
+        JambScholarshipApplicant.find()
+          .sort({ [sortBy]: order })
+          .skip(skip)
+          .limit(limit),
+      ]);
+  
+      res.status(200).json({
+        message: "JAMB scholarship applicants fetched successfully",
+        applicants,
+        totalItems: total,
+        currentPage: page,
+        itemsPerPage: limit,
+      });
+    } catch (error) {
+      console.error("Error fetching applicants:", error);
+      res.status(500).json({ message: "Server Error", error: error.message });
+    }
+  };
+  
 
 exports.getJambScholarshipApplicantById = async (req, res) => {
   try {
