@@ -13,7 +13,7 @@ router.post(
   upload.fields([
     { name: "jambSlip", maxCount: 1 },
     { name: "passport", maxCount: 1 },
-    { name: "oLevelSlip", maxCount: 1 },
+    // { name: "oLevelSlip", maxCount: 1 },
   ]),
   registerJambScholarshipApplicant
 );

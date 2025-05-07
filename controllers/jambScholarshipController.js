@@ -7,12 +7,7 @@ exports.registerJambScholarshipApplicant = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  if (
-    !req.files ||
-    !req.files.jambSlip ||
-    !req.files.passport ||
-    !req.files.oLevelSlip
-  ) {
+  if (!req.files || !req.files.jambSlip || !req.files.passport) {
     return res
       .status(400)
       .json({ message: "One or more required files are missing!" });
@@ -21,13 +16,13 @@ exports.registerJambScholarshipApplicant = async (req, res) => {
   try {
     const jambSlip = req.files.jambSlip[0].path.replace(/\\/g, "/");
     const passport = req.files.passport[0].path.replace(/\\/g, "/");
-    const oLevelSlip = req.files.oLevelSlip[0].path.replace(/\\/g, "/");
+    // const oLevelSlip = req.files.oLevelSlip[0].path.replace(/\\/g, "/");
 
     const newApplicant = new JambScholarshipApplicant({
       ...req.body,
       jambSlip,
       passport,
-      oLevelSlip,
+      //   oLevelSlip,
     });
 
     await newApplicant.save();
@@ -43,35 +38,34 @@ exports.registerJambScholarshipApplicant = async (req, res) => {
 };
 
 exports.getAllJambScholarshipApplicants = async (req, res) => {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
-  
-    const sortBy = req.query.sortBy || "createdAt";
-    const order = req.query.order === "asc" ? 1 : -1;
-  
-    try {
-      const [total, applicants] = await Promise.all([
-        JambScholarshipApplicant.countDocuments(),
-        JambScholarshipApplicant.find()
-          .sort({ [sortBy]: order })
-          .skip(skip)
-          .limit(limit),
-      ]);
-  
-      res.status(200).json({
-        message: "JAMB scholarship applicants fetched successfully",
-        applicants,
-        totalItems: total,
-        currentPage: page,
-        itemsPerPage: limit,
-      });
-    } catch (error) {
-      console.error("Error fetching applicants:", error);
-      res.status(500).json({ message: "Server Error", error: error.message });
-    }
-  };
-  
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  const sortBy = req.query.sortBy || "createdAt";
+  const order = req.query.order === "asc" ? 1 : -1;
+
+  try {
+    const [total, applicants] = await Promise.all([
+      JambScholarshipApplicant.countDocuments(),
+      JambScholarshipApplicant.find()
+        .sort({ [sortBy]: order })
+        .skip(skip)
+        .limit(limit),
+    ]);
+
+    res.status(200).json({
+      message: "JAMB scholarship applicants fetched successfully",
+      applicants,
+      totalItems: total,
+      currentPage: page,
+      itemsPerPage: limit,
+    });
+  } catch (error) {
+    console.error("Error fetching applicants:", error);
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
 
 exports.getJambScholarshipApplicantById = async (req, res) => {
   try {
