@@ -1,16 +1,49 @@
 const JambScholarshipApplicant = require("../models/jambScholarshipApplicants");
 
-exports.getApplicantsCountByState = async (req, res) => {
+exports.getApplicantsCountByGeopoliticalZones = async (req, res) => {
   try {
-    const targetStates = ["Abia", "Anambra", "Imo", "Enugu", "Ebonyi"];
+    const zoneMap = {
+      NorthCentral: [
+        "Benue",
+        "Kogi",
+        "Kwara",
+        "Nasarawa",
+        "Niger",
+        "Plateau",
+        "FCT",
+      ],
+      NorthEast: ["Adamawa", "Bauchi", "Borno", "Gombe", "Taraba", "Yobe"],
+      NorthWest: [
+        "Jigawa",
+        "Kaduna",
+        "Kano",
+        "Katsina",
+        "Kebbi",
+        "Sokoto",
+        "Zamfara",
+      ],
+      SouthEast: ["Abia", "Anambra", "Ebonyi", "Enugu", "Imo"],
+      SouthSouth: [
+        "Akwa Ibom",
+        "Bayelsa",
+        "Cross River",
+        "Delta",
+        "Edo",
+        "Rivers",
+      ],
+      SouthWest: ["Ekiti", "Lagos", "Ogun", "Ondo", "Osun", "Oyo"],
+    };
 
-    // Aggregate count of applicants per state
+    // Flatten the zoneMap to create a reverse lookup: state -> zone
+    const stateToZone = {};
+    for (const [zone, states] of Object.entries(zoneMap)) {
+      states.forEach((state) => {
+        stateToZone[state] = zone;
+      });
+    }
+
+    // Aggregate all applicants grouped by stateOfOrigin
     const stateCounts = await JambScholarshipApplicant.aggregate([
-      {
-        $match: {
-          stateOfOrigin: { $in: targetStates },
-        },
-      },
       {
         $group: {
           _id: "$stateOfOrigin",
@@ -19,24 +52,32 @@ exports.getApplicantsCountByState = async (req, res) => {
       },
     ]);
 
-    // Convert aggregation result to object for easier mapping
-    const countsMap = stateCounts.reduce((acc, item) => {
-      acc[item._id] = item.count;
+    // Initialize counts per zone
+    const zoneCounts = Object.keys(zoneMap).reduce((acc, zone) => {
+      acc[zone] = 0;
       return acc;
     }, {});
 
-    // Ensure all target states are represented, even with 0
-    const result = targetStates.map((state) => ({
-      state,
-      count: countsMap[state] || 0,
+    // Map state counts to zone counts
+    stateCounts.forEach(({ _id, count }) => {
+      const zone = stateToZone[_id];
+      if (zone) {
+        zoneCounts[zone] += count;
+      }
+    });
+
+    // Format result
+    const result = Object.entries(zoneCounts).map(([zone, count]) => ({
+      zone,
+      count,
     }));
 
     res.status(200).json({
-      message: "Applicants count by state fetched successfully",
+      message: "Applicants count by geopolitical zone fetched successfully",
       data: result,
     });
   } catch (error) {
-    console.error("Error fetching state analytics:", error);
+    console.error("Error fetching geopolitical zone analytics:", error);
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };

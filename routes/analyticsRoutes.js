@@ -1,12 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const {
-  getApplicantsCountByState,
+    getApplicantsCountByGeopoliticalZones,
   getApplicantsCountBySex,
   getApplicantsCountByJambScoreRange,
 } = require("../controllers/analyticsController");
 
-router.get("/analytics/state-count", getApplicantsCountByState);
+router.get("/analytics/zone-count", getApplicantsCountByGeopoliticalZones);
 router.get("/analytics/sex-count", getApplicantsCountBySex);
 router.get("/analytics/jamb-score-range", getApplicantsCountByJambScoreRange);
 
