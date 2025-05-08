@@ -44,11 +44,18 @@ exports.getAllJambScholarshipApplicants = async (req, res) => {
 
   const sortBy = req.query.sortBy || "createdAt";
   const order = req.query.order === "asc" ? 1 : -1;
+  const stateOfOrigin = req.query.stateOfOrigin;
+
+  let query = {};
+
+  if (stateOfOrigin) {
+    query.stateOfOrigin = stateOfOrigin;
+  }
 
   try {
     const [total, applicants] = await Promise.all([
-      JambScholarshipApplicant.countDocuments(),
-      JambScholarshipApplicant.find()
+      JambScholarshipApplicant.countDocuments(query),
+      JambScholarshipApplicant.find(query)
         .sort({ [sortBy]: order })
         .skip(skip)
         .limit(limit),
