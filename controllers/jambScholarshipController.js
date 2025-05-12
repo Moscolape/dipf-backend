@@ -45,11 +45,16 @@ exports.getAllJambScholarshipApplicants = async (req, res) => {
   const sortBy = req.query.sortBy || "createdAt";
   const order = req.query.order === "asc" ? 1 : -1;
   const stateOfOrigin = req.query.stateOfOrigin;
+  const jambExamState = req.query.jambExamState;
 
   let query = {};
 
   if (stateOfOrigin) {
     query.stateOfOrigin = stateOfOrigin;
+  }
+
+  if (jambExamState) {
+    query.jambExamState = jambExamState;
   }
 
   try {
