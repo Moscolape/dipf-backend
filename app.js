@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const jambScholarshipRoutes = require("./routes/jambScholarshipRoutes");
 const userRoutes = require("./routes/userRoutes");
 const analyticsRoutes = require("./routes/analyticsRoutes");
+const memberRoutes = require("./routes/membersRoutes");
 
 const app = express();
 app.use(express.json());
@@ -24,16 +25,14 @@ app.use(cors({
   credentials: true
 }));
 
-
-// Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.log("MongoDB Connection Error:", err));
 
-// Use routes
 app.use('/api/v1', jambScholarshipRoutes);
 app.use('/api/v1', userRoutes);
 app.use('/api/v1', analyticsRoutes);
+app.use('/api/v1', memberRoutes);
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
