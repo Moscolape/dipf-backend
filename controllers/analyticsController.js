@@ -82,6 +82,84 @@ exports.getApplicantsCountByGeopoliticalZones = async (req, res) => {
   }
 };
 
+exports.getApplicantsCountByJambExamStateZones = async (req, res) => {
+    try {
+      const zoneMap = {
+        NorthCentral: [
+          "Benue",
+          "Kogi",
+          "Kwara",
+          "Nasarawa",
+          "Niger",
+          "Plateau",
+          "FCT",
+        ],
+        NorthEast: ["Adamawa", "Bauchi", "Borno", "Gombe", "Taraba", "Yobe"],
+        NorthWest: [
+          "Jigawa",
+          "Kaduna",
+          "Kano",
+          "Katsina",
+          "Kebbi",
+          "Sokoto",
+          "Zamfara",
+        ],
+        SouthEast: ["Abia", "Anambra", "Ebonyi", "Enugu", "Imo"],
+        SouthSouth: [
+          "Akwa Ibom",
+          "Bayelsa",
+          "Cross River",
+          "Delta",
+          "Edo",
+          "Rivers",
+        ],
+        SouthWest: ["Ekiti", "Lagos", "Ogun", "Ondo", "Osun", "Oyo"],
+      };
+  
+      const stateToZone = {};
+      for (const [zone, states] of Object.entries(zoneMap)) {
+        states.forEach((state) => {
+          stateToZone[state] = zone;
+        });
+      }
+  
+      const jambStateCounts = await JambScholarshipApplicant.aggregate([
+        {
+          $group: {
+            _id: "$jambExamState",
+            count: { $sum: 1 },
+          },
+        },
+      ]);
+  
+      const zoneCounts = Object.keys(zoneMap).reduce((acc, zone) => {
+        acc[zone] = 0;
+        return acc;
+      }, {});
+  
+      jambStateCounts.forEach(({ _id, count }) => {
+        const zone = stateToZone[_id];
+        if (zone) {
+          zoneCounts[zone] += count;
+        }
+      });
+  
+      const result = Object.entries(zoneCounts).map(([zone, count]) => ({
+        zone,
+        count,
+      }));
+  
+      res.status(200).json({
+        message: "Applicants count by JAMB exam state zone fetched successfully",
+        data: result,
+      });
+    } catch (error) {
+      console.error("Error fetching JAMB exam state zone analytics:", error);
+      res.status(500).json({ message: "Server Error", error: error.message });
+    }
+  };
+  
+
 exports.getApplicantsCountBySex = async (req, res) => {
   try {
     const sexCounts = await JambScholarshipApplicant.aggregate([
