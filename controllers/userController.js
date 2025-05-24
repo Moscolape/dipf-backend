@@ -46,7 +46,8 @@ exports.loginUser = async (req, res) => {
 
     res.status(200).json({
       message: "Login successful. Redirecting...",
-      token
+      token,
+      username
     });
   } catch (error) {
     console.error("Login Error:", error);
