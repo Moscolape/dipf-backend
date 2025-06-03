@@ -96,3 +96,22 @@ exports.getJambScholarshipApplicantById = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
+
+
+exports.deleteJambScholarshipApplicantById = async (req, res) => {
+  try {
+    const applicant = await JambScholarshipApplicant.findByIdAndDelete(req.params.id);
+
+    if (!applicant) {
+      return res.status(404).json({ message: "Applicant not found" });
+    }
+
+    res.status(200).json({
+      message: "Applicant deleted successfully",
+      applicant,
+    });
+  } catch (error) {
+    console.error("Error deleting applicant:", error);
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};

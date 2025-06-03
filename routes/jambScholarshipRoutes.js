@@ -3,6 +3,7 @@ const {
   registerJambScholarshipApplicant,
   getAllJambScholarshipApplicants,
   getJambScholarshipApplicantById,
+  deleteJambScholarshipApplicantById
 } = require("../controllers/jambScholarshipController");
 const upload = require("../config/multerConfig");
 
@@ -19,5 +20,6 @@ router.post(
 );
 router.get("/applicants", getAllJambScholarshipApplicants);
 router.get("/applicants/:id", getJambScholarshipApplicantById);
+router.delete("/applicants/:id", deleteJambScholarshipApplicantById);
 
 module.exports = router;
